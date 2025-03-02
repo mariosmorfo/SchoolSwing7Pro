@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-//import gr.aueb.cf.schoolapp.model.City;
+import gr.aueb.cf.schoolapp.model.City;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -43,10 +43,18 @@ public class TeacherView extends JFrame {
 	private JLabel cityText;
 	private JLabel zipcodeText;
 
-	//private List<City> cities = new ArrayList<>();
+	private List<City> cities = new ArrayList<>();
 	
 	
 	public TeacherView() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowActivated(WindowEvent e) {
+				
+				cities = fetchCitiesFromDatabase();
+				fetchTeacherFromDatabase(Main.getViewTeachersPage().getSelectedId());
+			}
+		});
 	
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 753, 714);
@@ -218,5 +226,72 @@ public class TeacherView extends JFrame {
 		footer.add(separator_2);
 	}
 	
+	private List<City> fetchCitiesFromDatabase(){
+		String sql = "SELECT * FROM cities order by name asc";
+		List<City> cities = new ArrayList<>();
+		Connection conn = Dashboard.getConnection();
+		
+		try(PreparedStatement ps = conn.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery()) {
+				while(rs.next()) {
+					int id = rs.getInt("id");
+					String name = rs.getString("name");
+					
+					City city = new City (id, name);
+					cities.add(city);
+				}
+				
+			}catch(SQLException e) {
+				JOptionPane.showMessageDialog(null, "Select error in fetch cities", "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		return cities;
+	}
+
+
+
+
+
 	
-}
+	private void fetchTeacherFromDatabase(int id) {
+		String sql = "SELECT * FROM teachers WHERE id = ?";
+		Connection conn = Dashboard.getConnection();
+		
+		try(PreparedStatement ps = conn.prepareStatement(sql)){
+			
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				kwdikosText.setText(rs.getString("uuid"));
+				firstnameText.setText(rs.getString("firstname"));
+				lastnameText.setText(rs.getString("lastname"));
+				vatText.setText(rs.getString("vat"));
+				fathernameText.setText(rs.getString("fathername"));
+				phoneNumText.setText(rs.getString("phone_num"));
+				emailText.setText(rs.getString("email"));
+				streetText.setText(rs.getString("street"));
+				streetNumText.setText(rs.getString("street_num"));
+				int cityIdFromDB = rs.getInt("city_id");
+				
+				City selectedCity = cities.stream()
+					    .filter(city -> city.getId() == cityIdFromDB)
+					    .findFirst()
+					    .orElse(null);
+				
+				if (selectedCity != null) {
+				    cityText.setText(selectedCity.getName());
+				}
+	
+				zipcodeText.setText(rs.getString("zipcode"));
+				}
+				
+			}catch (SQLException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null,  "Select error in fetch teacher", "Error", JOptionPane.ERROR_MESSAGE);	
+			}
+			
+	
+		}
+	}
+	
+

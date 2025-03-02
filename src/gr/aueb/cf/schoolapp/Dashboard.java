@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import java.awt.Font;
 import javax.swing.JSeparator;
@@ -19,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Connection;
 
@@ -204,7 +206,7 @@ public class Dashboard extends JFrame {
 		btnNewButton_1_1_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Main.getDashboard().setEnabled(false);
-				Main.getInsertTeacherPage().setVisible(true);
+				Main.getViewTeachersPage().setVisible(true);
 			}
 		});
 		btnNewButton_1_1_1.setForeground(Color.WHITE);
@@ -217,4 +219,7 @@ public class Dashboard extends JFrame {
 	public static Connection getConnection() {
 		return connection;
 	}
-}
+	
+		
+	}
+	

@@ -62,6 +62,11 @@ public class ViewTeachersPage extends JFrame {
 		lastnameText.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Αναζήτηση");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				buildTable();
+			}
+		});
 	
 		btnNewButton.setBackground(new Color(0, 128, 0));
 		btnNewButton.setForeground(new Color(255, 255, 255));
@@ -69,6 +74,12 @@ public class ViewTeachersPage extends JFrame {
 		contentPane.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("Εκκαθάριση");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				lastnameText.setText("");
+				buildTable();
+			}
+		});
 		
 		btnNewButton_1.setForeground(new Color(192, 192, 192));
 		btnNewButton_1.setBounds(439, 130, 125, 40);
@@ -116,7 +127,7 @@ public class ViewTeachersPage extends JFrame {
 		viewBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Main.getViewTeachersPage().setEnabled(false);
-				Main.getUpdateTeacherPage().setVisible(true);
+				Main.getTeacherView().setVisible(true);
 			}
 			
 		});
@@ -142,6 +153,11 @@ public class ViewTeachersPage extends JFrame {
 		contentPane.add(updateBtn);
 		
 		JButton btnDelete = new JButton("Διαγραφή");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doDelete(selectedId);
+			}
+		});
 		btnDelete.setForeground(new Color(255, 255, 255));
 	
 		btnDelete.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -251,4 +267,31 @@ public class ViewTeachersPage extends JFrame {
 			
 		}
 	}
+	
+
+	private void doDelete(int id) {
+		String sql = "DELETE FROM teachers WHERE id = ?";
+		Connection conn = Dashboard.getConnection();
+		
+		try(PreparedStatement ps = conn.prepareStatement(sql)) {
+			
+			ps.setInt(1, id);
+			
+			int answer = JOptionPane.showConfirmDialog(null,"Είστε σίγουρος/η" , "Διαγραφή",
+					JOptionPane.YES_NO_OPTION);
+			
+			if(answer == JOptionPane.YES_OPTION) {
+				int rowsAffected = ps.executeUpdate();
+				JOptionPane.showMessageDialog(null ,rowsAffected + " γραμμή/ες διαγράφηκαν" , "Διαγραφή",
+						JOptionPane.INFORMATION_MESSAGE);
+				
+			} else {
+				return;
+			}
+			
+			
+		}catch(SQLException ex) {
+			
+		}
+}
 }
